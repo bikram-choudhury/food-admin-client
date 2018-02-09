@@ -1,0 +1,127 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10 col-md-12" *ngIf="processType==='manage'" >
+                <div class="card">
+                    <form #form="ngForm" class="form-horizontal" autocomplete="off" novalidate>
+                        <div class="card-header card-header-text" data-background-color="rose">
+                            <h4 class="card-title">Dish Elements</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Dish Name:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" #name="ngModel" name="name" value="" required="" [(ngModel)]="dataModel.name" >
+                                        <span class="help-block">Enter Dish Name</span>
+                                        <small [hidden]="name.valid || (name.pristine && !form.submitted)" class="text-danger pull-right"> Dish Name must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Dish Category:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group">
+                                        <select class="form-control" title="Choose Type" [(ngModel)]="dataModel.dcat" name="category" #category="ngModel" required="">
+                                            <option disabled value=""> Choose Type</option>
+                                            <option *ngFor="let list of dish_category;" [ngValue]="list._id">{{list.name}}</option>
+                                        </select>
+                                        <small [hidden]="category.valid || (category.pristine && !form.submitted)" class="text-danger pull-right"> Dish Category must be choosen. </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Price:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" #price="ngModel" name="price" value="" required="" [(ngModel)]="dataModel.price" >
+                                        <span class="help-block">Enter Price</span>
+                                        <small [hidden]="price.valid || (price.pristine && !form.submitted)" class="text-danger pull-right"> Price must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Short Code:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" #shortcode="ngModel" name="shortcode" value="" required="" [(ngModel)]="dataModel.scd" >
+                                        <span class="help-block">Enter Short Code</span>
+                                        <small [hidden]="shortcode.valid || (shortcode.pristine && !form.submitted)" class="text-danger pull-right"> Short Code must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Num Code:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="number" maxlength="5" class="form-control" #numcode="ngModel" name="numcode" value="" required="" [(ngModel)]="dataModel.ncd" >
+                                        <span class="help-block">Enter Num Code</span>
+                                        <small [hidden]="numcode.valid || (numcode.pristine && !form.submitted)" class="text-danger pull-right"> Inalid Num Code & must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center form-group">
+                            	<button class="btn btn-success" (click)="saveForm(form)" >
+	                                <i class="material-icons">check</i>Submit
+		                        </button>
+		                        <button type="button" class="btn btn-danger" (click)="resetModels()" >
+		                            <i class="material-icons">close</i> Cancel
+		                        </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="processType==='view'">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="rose">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Dish List</h4>
+                        <div class="table-responsive">
+                        
+                            <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                          <th class="text-center">{{ viewData.headerRow[0] }}</th>
+                                          <th>{{ viewData.headerRow[1] }}</th>
+                                          <th>{{ viewData.headerRow[2] }}</th>
+                                          <th>{{ viewData.headerRow[3] }}</th>
+                                          <th>{{ viewData.headerRow[4] }}</th>
+                                          <th>{{ viewData.headerRow[5] }}</th>
+                                          <th>{{ viewData.headerRow[6] }}</th>
+                                        </tr>
+                                    </thead>
+                                  <tbody>
+                                      <tr *ngFor="let row of viewData.dataRows; let count = index; ">
+                                          <td class="text-center">{{count+1}}</td>
+                                          <td>{{row.name}}</td>
+                                          <td>{{getDishCategoryDetailsById(row.dcat)}}</td>
+                                          <td>{{row.price}}</td>
+                                          <td>{{row.scd}}</td>
+                                          <td>{{row.ncd}}</td>
+                                          <td class="td-actions">
+                                              <button type="button" rel="tooltip" class="btn btn-success" (click)="editForm(row._id)">
+                                                  <i class="material-icons">edit</i>
+                                              </button>
+                                              <button type="button" rel="tooltip" class="btn btn-danger" (click)="delete(row._id)">
+                                                  <i class="material-icons">close</i>
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

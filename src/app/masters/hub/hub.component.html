@@ -1,0 +1,131 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10 col-md-12" *ngIf="processType==='manage'">
+                <div class="card">
+                    <form #hubForm="ngForm" class="form-horizontal" autocomplete="off" novalidate>
+                        <div class="card-header card-header-text" data-background-color="rose">
+                            <h4 class="card-title">Hub Elements</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Name:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" #name="ngModel" name="name" value="" required="" [(ngModel)]="hubModel.name" >
+                                        <span class="help-block">Enter Hub Name</span>
+                                        <small [hidden]="name.valid || (name.pristine && !hubForm.submitted)" class="text-danger pull-right"> Name must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Address:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+    	                                <textarea class="form-control" [(ngModel)]="hubModel.address" #address="ngModel" required="" name="address"></textarea>
+        	                            <span class="help-block">Enter Address</span>
+                                        <small [hidden]="address.valid || (address.pristine && !hubForm.submitted)" class="text-danger pull-right"> Address must be filled. </small>
+	                                </div>
+                                </div>
+                            </div>
+                            <div class="row" >
+
+                                <label class="col-sm-3 label-on-left">Approval List:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group">
+    	                                <select class="selectpicker" data-style="select-with-transition" multiple title="Choose Approvals" data-size="7" [(ngModel)]="hubModel.approvalList" name="approvalpicker" #approval="ngModel" >
+                                            <option disabled> Choose Approvals</option>
+                                            <option *ngFor="let list of approvalList;" [ngValue]="list.key">{{list.title}}</option>
+                                            
+                                        </select>
+	                                </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Registered with GST:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group">
+	                                    <div class="radio radio-inline radio-warning">
+	                                        <label>
+	                                            <input type="radio" name="is_gst_registered" (ngModelChange)="resetInput()" [(ngModel)]="hubModel.gstStatus" value="yes" #gstLocalModel="ngModel" >Yes
+	                                        </label>
+	                                    </div>
+	                                    <div class="radio radio-inline">
+	                                        <label>
+	                                            <input type="radio" name="is_gst_registered" (ngModelChange)="resetInput()" [(ngModel)]="hubModel.gstStatus" value="no" #gstLocalModel="ngModel"> No
+	                                        </label>
+	                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="hubModel.gstStatus==='yes'">
+                                <label class="col-sm-3 label-on-left">GST Registration No:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" required="" name="gst_no" [(ngModel)]="hubModel.gstno" value="" #gstValue="ngModel">
+                                        <span class="help-block">Enter GST No For Hub</span>
+                                        <small [hidden]="gstValue.valid || (gstValue.pristine && !hubForm.submitted)" class="text-danger pull-right"> GST must be filled if it is registered with GST. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center form-group">
+                            	<button class="btn btn-success" (click)="saveForm(hubForm)" >
+	                                <i class="material-icons">check</i>Submit
+		                        </button>
+		                        <button type="button" class="btn btn-danger" (click)="resetModels()" >
+		                            <i class="material-icons">close</i> Cancel
+		                        </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="processType==='view'">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="rose">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Hub List</h4>
+                        <div class="table-responsive">
+                        
+                            <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                          <th class="text-center">{{ hubData.headerRow[0] }}</th>
+                                          <th>{{ hubData.headerRow[1] }}</th>
+                                          <th>{{ hubData.headerRow[2] }}</th>
+                                          <th>{{ hubData.headerRow[3] }}</th>
+                                          <th>{{ hubData.headerRow[4] }}</th>
+                                          <th>{{ hubData.headerRow[5] }}</th>
+                                        </tr>
+                                    </thead>
+                                  <tbody>
+                                      <tr *ngFor="let row of hubData.dataRows; let count = index; ">
+                                          <td class="text-center">{{count+1}}</td>
+                                          <td>{{row.name}}</td>
+                                          <td>{{row.address}}</td>
+                                          <td>{{assignedApprovals(row.approvalList)}}</td>
+                                          <td>{{row.gstno}}</td>
+                                          <td class="td-actions">
+                                              <button type="button" rel="tooltip" class="btn btn-success" (click)="editHub(row._id)">
+                                                  <i class="material-icons">edit</i>
+                                              </button>
+                                              <button type="button" rel="tooltip" class="btn btn-danger" (click)="deleteHub(row._id)">
+                                                  <i class="material-icons">close</i>
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

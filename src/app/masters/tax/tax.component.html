@@ -1,0 +1,160 @@
+
+<div class="modal fade" id="taxModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">{{modalHeader}}</h4>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive" *ngIf="taxData.dataRows">
+              <table class="table table-bordered">
+                  <thead>
+                      <tr>
+                        <th class="text-center">{{ taxData.headerRow[0] }}</th>
+                        <th>{{ taxData.headerRow[1] }} ( % )</th>
+                        <th>{{ taxData.headerRow[2] }}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let row of taxData.dataRows; let count = index; ">
+                          <td class="text-center">
+                            <div class="checkbox content-inline">
+                                <label>
+                                    <input type="checkbox" class="taxId-checkbox" 
+                                      [value]="row._id"
+                                      (change)="onChangeForTaxList(row._id,$event.target.checked)" >
+                                </label>
+                                &ensp;{{count+1}}
+                            </div>
+                          </td>
+                          <td>{{row.name}} ( {{utils.ternary(row.prcnt,0)}} % )</td>
+                          <td>{{row.mstrTyp}}</td>
+                      </tr>
+                  </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <small class="text-danger" *ngIf="associativeTax.length < 2"> * Two Itmes must be selected. </small>
+          <button type="button" class="btn btn-info" data-dismiss="modal" (click)="saveAssociativeTax()" *ngIf="associativeTax.length >= 2" >Save</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10 col-md-12" *ngIf="processType==='manage'">
+                <div class="card">
+                    <form #form="ngForm" class="form-horizontal" autocomplete="off" novalidate>
+                        <div class="card-header card-header-text" data-background-color="rose">
+                            <h4 class="card-title">Tax Elements</h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="row">
+                                <label class="col-sm-3 label-on-left">Tax Name:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group label-floating is-empty">
+                                        <label class="control-label"></label>
+                                        <input type="text" class="form-control" #name="ngModel" name="name" value="" required="" [(ngModel)]="taxModel.name" >
+                                        <span class="help-block">Enter Tax Name</span>
+                                        <small [hidden]="name.valid || (name.pristine && !form.submitted)" class="text-danger pull-right"> Tax Name must be filled. </small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row" >
+                                <label class="col-sm-3 label-on-left">Master Type:</label>
+                                <div class="col-md-7 col-sm-9">
+                                    <div class="form-group">
+                                      <select class="form-control" title="Choose Type" [(ngModel)]="taxModel.masterType" name="typepicker" #approval="ngModel" required="">
+                                            <option disabled value=""> Choose Type</option>
+                                            <option *ngFor="let list of typeMasterList;" [ngValue]="list.key">{{list.title}}</option>
+                                        </select>
+                                        <small [hidden]="name.valid || (name.pristine && !form.submitted)" class="text-danger pull-right"> Master type must be choosen. </small>
+                                  </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row" >
+                                <label class="col-sm-3 label-on-left">is Tax group:</label>
+                                <div class="col-md-3 col-sm-4">
+                                    <div class="form-group">
+                                      <div class="checkbox">
+                                          <label>
+                                              <input type="checkbox" name="isTaxGroup" #taxGroup="ngModel" [(ngModel)]="taxModel.taxgroupStatus" > Yes
+                                          </label>
+                                      </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-5 col-sm-4">
+                                    <div class="form-group" [hidden]="!taxModel.taxgroupStatus">
+                                      <button type="button" class="btn btn-primary" rel="tooltip" data-placement="right" title="Choose Taxes to group those." data-toggle="modal" data-target="#taxModal" (click)="openTaxModal()">Choose</button>
+                                  </div>
+                                  <div class="form-group label-floating" [hidden]="taxModel.taxgroupStatus">
+    	                                <label class="control-label">Tax Percent</label>
+                                      <input type="text" class="form-control" #prcnt="ngModel" name="prcnt" value="" [(ngModel)]="taxModel.prcnt" [required]="!taxModel.taxgroupStatus">
+                                      <span class="help-block">Enter Tax Percent</span>
+                                      <small [hidden]="prcnt.valid || (prcnt.pristine && !form.submitted)" class="text-danger pull-right"> Tax Percent must be filled. </small>
+	                                </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center form-group">
+                            	<button class="btn btn-success" (click)="saveForm(form)" >
+	                                <i class="material-icons">check</i>Submit
+		                        </button>
+		                        <button type="button" class="btn btn-danger" (click)="resetModels()" >
+		                            <i class="material-icons">close</i> Cancel
+		                        </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="processType==='view'">
+                <div class="card">
+                    <div class="card-header card-header-icon" data-background-color="rose">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="card-title">Tax List</h4>
+                        <div class="table-responsive">
+                        
+                            <table class="table table-bordered">
+                                  <thead>
+                                      <tr>
+                                        <th class="text-center">{{ taxData.headerRow[0] }}</th>
+                                        <th>{{ taxData.headerRow[1] }} ( % )</th>
+                                        <th>{{ taxData.headerRow[2] }}</th>
+                                        <th>{{ taxData.headerRow[3] }}</th>
+                                        <th>{{ taxData.headerRow[4] }}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr *ngFor="let row of taxData.dataRows; let count = index; ">
+                                          <td class="text-center">{{count+1}}</td>
+                                          <td>{{row.name}} ( {{utils.ternary(row.prcnt,0)}} % )</td>
+                                          <td>{{row.mstrTyp}}</td>
+                                          <td>{{getTaxname(row.grpTaxLst,'name')}}</td>
+                                          <td class="td-actions">
+                                              <button type="button" rel="tooltip" class="btn btn-success" (click)="editTax(row._id)">
+                                                  <i class="material-icons">edit</i>
+                                              </button>
+                                              <button type="button" rel="tooltip" class="btn btn-danger" (click)="deleteTax(row._id)">
+                                                  <i class="material-icons">close</i>
+                                              </button>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
