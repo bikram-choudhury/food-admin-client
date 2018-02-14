@@ -7,7 +7,7 @@ declare var $:any;
 
 export class utilityService {
 	
-	httpHost:string = '//localhost:4080';
+	httpHost:string = '//bitpos-server-flvsiyoqke.now.sh/';
 	hubApprovalList:any = [
 		{
 			key:'1',
